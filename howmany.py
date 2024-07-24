@@ -15,9 +15,6 @@ DEFAULT_CONSUMPTION_RATE = 1.0  # 1.0 is average, >1.0 for heavier drinking, <1.
 
 # Standard drink calculations
 DRINKS_PER_PERSON_PER_HOUR = 1
-BEER_PERCENTAGE = 0.4
-WINE_PERCENTAGE = 0.3
-COCKTAIL_PERCENTAGE = 0.3
 
 def signal_handler(sig, frame):
     print("\n\nProcess interrupted. Exiting gracefully.")
@@ -30,7 +27,7 @@ def get_input(prompt, default, input_type=float):
     return input_type(user_input) if user_input else default
 
 def calculate_drinks(guests, hours, beer_pref, wine_pref, cocktail_pref, consumption_rate):
-    total_drinks = guests * hours * DRINKS_PER_PERSON_PER_HOUR * consumption_rate
+    total_drinks = math.ceil(guests * hours * DRINKS_PER_PERSON_PER_HOUR * consumption_rate)
     
     # Calculate preference weights
     total_preference = beer_pref + wine_pref + cocktail_pref
@@ -39,14 +36,14 @@ def calculate_drinks(guests, hours, beer_pref, wine_pref, cocktail_pref, consump
     cocktail_weight = cocktail_pref / total_preference
     
     # Calculate drinks by type
-    beers = math.ceil(total_drinks * beer_weight * BEER_PERCENTAGE)
-    wines = math.ceil(total_drinks * wine_weight * WINE_PERCENTAGE)
-    cocktails = math.ceil(total_drinks * cocktail_weight * COCKTAIL_PERCENTAGE)
+    beers = math.ceil(total_drinks * beer_weight)
+    wines = math.ceil(total_drinks * wine_weight)
+    cocktails = math.ceil(total_drinks * cocktail_weight)
     
     # Recalculate total drinks as sum of individual drink types
-    total_drinks = beers + wines + cocktails
+    actual_total = beers + wines + cocktails
     
-    return beers, wines, cocktails, total_drinks
+    return beers, wines, cocktails, actual_total
 
 def print_decorated_output(guests, hours, beer_pref, wine_pref, cocktail_pref, consumption_rate, beers, wines, cocktails, total_drinks):
     line_length = 40
